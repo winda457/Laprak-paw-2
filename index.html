@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal Dashboard Mahasiswa - Aplikasi produktivitas untuk manajemen tugas, jadwal kuliah, dan catatan harian.">
+  <title>StudentFlow - Personal Dashboard Mahasiswa</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div>
+          <h1 class="brand-title">StudentFlow</h1>
+          <p class="brand-subtitle">Personal Dashboard Mahasiswa</p>
+        </div>
+      </div>
+
+      <!-- Realtime Clock & Date -->
+      <div class="clock-card" id="clockCard">
+        <div class="clock-time" id="realtimeClock">00:00:00 WIB</div>
+        <div class="clock-date" id="realtimeDate">Memuat tanggal...</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+    <!-- Welcome Banner & Motivational Quote (Async/Await) -->
+    <section class="banner-section">
+      <div class="banner-content">
+        <div class="greeting-box">
+          <h2 id="greetingText">Selamat Datang, Mahasiswa! 👋</h2>
+          <p class="greeting-sub">Kelola tugas kuliah, jadwal, dan catatan belajarmu dengan teratur hari ini.</p>
+        </div>
+        
+        <!-- Motivational Quote Box fetched via Async/Await -->
+        <div class="quote-card" id="quoteCard">
+          <div class="quote-header">
+            <span class="quote-badge"><i class="fa-solid fa-lightbulb"></i> Inspirasi Harian</span>
+            <button id="refreshQuoteBtn" class="btn-icon" title="Perbarui Kutipan" aria-label="Perbarui Kutipan">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+          <p class="quote-text" id="quoteContent">"Memuat kutipan motivasi..."</p>
+          <p class="quote-author" id="quoteAuthor">-</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stat Cards Overview -->
+    <section class="stats-grid" id="statsSection">
+      <div class="stat-card">
+        <div class="stat-icon icon-blue">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">Total Tugas</span>
+          <span class="stat-value" id="statTotalTasks">0</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-orange">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">Sedang Dikerjakan</span>
+          <span class="stat-value" id="statPendingTasks">0</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-green">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">Tugas Selesai</span>
+          <span class="stat-value" id="statCompletedTasks">0</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-red">
+          <i class="fa-solid fa-fire"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">Deadline Mendekat</span>
+          <span class="stat-value" id="statUpcomingTasks">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Layout (Tasks + Sidebar) -->
+    <div class="layout-grid">
+      <!-- Left Column: Task Management (Interactive CRUD) -->
+      <section class="tasks-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title"><i class="fa-solid fa-book-bookmark"></i> Daftar Tugas & Deadline</h2>
+            <p class="section-subtitle">Pantau dan selesaikan tugas kuliah tepat waktu</p>
+          </div>
+          <button id="btnOpenAddModal" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Tambah Tugas
+          </button>
+        </div>
+
+        <!-- Task Controls: Filter Tabs & Search -->
+        <div class="task-controls">
+          <div class="filter-tabs" role="tablist">
+            <button class="filter-btn active" data-filter="all">Semua</button>
+            <button class="filter-btn" data-filter="pending">Belum Selesai</button>
+            <button class="filter-btn" data-filter="completed">Selesai</button>
+          </div>
+
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="taskSearchInput" placeholder="Cari tugas atau mata kuliah..." aria-label="Cari tugas">
+          </div>
+        </div>
+
+        <!-- Task List Container (Rendered dynamically using Template Literals) -->
+        <div class="task-list" id="taskListContainer">
+          <!-- Tugas akan dirender di sini oleh JavaScript -->
+        </div>
+      </section>
+
+      <!-- Right Column: Schedule & Quick Notes -->
+      <aside class="sidebar-section">
+        <!-- Jadwal Kuliah Hari Ini -->
+        <div class="sidebar-card">
+          <div class="sidebar-header">
+            <h3><i class="fa-solid fa-calendar-day"></i> Jadwal Kuliah Hari Ini</h3>
+            <span class="day-badge" id="currentDayBadge">Hari ini</span>
+          </div>
+          <div class="schedule-list" id="scheduleList">
+            <div class="schedule-item">
+              <span class="schedule-time">08:00 - 09:40</span>
+              <div class="schedule-info">
+                <strong>Pengembangan Aplikasi Web</strong>
+                <p>Ruang Lab Komputer 2 • Gedung C</p>
+              </div>
+            </div>
+            <div class="schedule-item">
+              <span class="schedule-time">10:00 - 11:40</span>
+              <div class="schedule-info">
+                <strong>Basis Data Lanjut</strong>
+                <p>Ruang Kuliah GKU 304</p>
+              </div>
+            </div>
+            <div class="schedule-item">
+              <span class="schedule-time">13:30 - 15:10</span>
+              <div class="schedule-info">
+                <strong>Kecerdasan Buatan</strong>
+                <p>Ruang Kuliah Lab AI • Gedung F</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Catatan Ringkas / Quick Notes (Stored in localStorage) -->
+        <div class="sidebar-card">
+          <div class="sidebar-header">
+            <h3><i class="fa-solid fa-pen-to-square"></i> Catatan Cepat</h3>
+            <span class="save-status" id="noteSaveStatus"><i class="fa-solid fa-check"></i> Tersimpan</span>
+          </div>
+          <p class="notes-desc">Catat ide, link materi, atau pengumuman penting dosen:</p>
+          <textarea id="quickNotesArea" class="quick-notes-textarea" placeholder="Tulis catatan kuliah di sini... (otomatis tersimpan ke LocalStorage)"></textarea>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Modal Dialog for Add / Edit Task -->
+  <dialog id="taskModal" class="task-modal">
+    <div class="modal-wrapper">
+      <div class="modal-header">
+        <h3 id="modalTitle">Tambah Tugas Kuliah</h3>
+        <button id="btnCloseModal" class="btn-close" aria-label="Tutup Modal">&times;</button>
+      </div>
+
+      <form id="taskForm" class="task-form">
+        <input type="hidden" id="taskIdInput">
+
+        <div class="form-group">
+          <label for="taskTitleInput">Judul Tugas <span class="required">*</span></label>
+          <input type="text" id="taskTitleInput" placeholder="Contoh: Buat Laporan Praktikum Modul 2" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskSubjectInput">Mata Kuliah <span class="required">*</span></label>
+            <input type="text" id="taskSubjectInput" placeholder="Contoh: PAW / Basis Data" required>
+          </div>
+
+          <div class="form-group">
+            <label for="taskPriorityInput">Prioritas</label>
+            <select id="taskPriorityInput">
+              <option value="Tinggi">Tinggi (Mendesak)</option>
+              <option value="Sedang" selected>Sedang</option>
+              <option value="Rendah">Rendah</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="taskDeadlineInput">Tenggat Waktu (Deadline) <span class="required">*</span></label>
+          <input type="date" id="taskDeadlineInput" required>
+        </div>
+
+        <div class="form-group">
+          <label for="taskNotesInput">Keterangan Tambahan (Opsional)</label>
+          <textarea id="taskNotesInput" rows="3" placeholder="Contoh: Dikumpulkan dalam format PDF melalui Google Classroom"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="btnCancelTask" class="btn btn-secondary">Batal</button>
+          <button type="submit" id="btnSaveTask" class="btn btn-primary">Simpan Tugas</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>StudentFlow &copy; 2026 • Dibuat untuk Tugas Pengembangan Aplikasi Web (PAW)</p>
+      <p class="footer-sub">Fitur: ES6+ (let/const, Arrow Functions, Template Literals, Classes, Async/Await) &bull; LocalStorage</p>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+</body>
+</html>
